@@ -36,6 +36,11 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import csv
+          import re
+
+          def normalize_label(label):
+              label = re.sub(r"^\s*\d+\.\s*", "", label)
+              return re.sub(r"\s+", " ", label).strip().lower()
 
           path = Path("data/week-2/tri_ca_basic_2024.csv")
           if not path.exists():
@@ -48,11 +53,11 @@ jobs:
               header = next(reader, None)
               if not header:
                   raise SystemExit("Downloaded file has no CSV header")
-              clean_header = {col.strip() for col in header}
-              required = {"County", "Facility Name", "Chemical", "Total Releases"}
+              clean_header = {normalize_label(col) for col in header}
+              required = {"county", "facility name", "chemical", "total releases"}
               missing = sorted(required - clean_header)
               if missing:
-                  raise SystemExit(f"Missing expected columns: {missing}; first columns: {header[:20]}")
+                  raise SystemExit(f"Missing expected normalized columns: {missing}; first columns: {header[:25]}")
               row_count = sum(1 for _ in reader)
               if row_count == 0:
                   raise SystemExit("Downloaded CSV has a header but no data rows")
@@ -78,6 +83,8 @@ jobs:
           ## Notes
 
           EPA describes TRI Basic Data Files as CSV files containing commonly used fields from TRI reporting forms, including facility information, chemical identification, industry information, on-site releases, off-site transfers, and waste-management quantities.
+
+          EPA's CSV column names include numeric prefixes, such as `7. COUNTY`. Course notebooks normalize those labels before selecting columns.
 
           EPA notes that dioxin and dioxin-like compounds are reported in grams, while most other TRI release quantities are reported in pounds. Course materials should handle or explicitly name that unit caveat before interpreting release totals.
           EOF
