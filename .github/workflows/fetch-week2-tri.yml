@@ -1,0 +1,79 @@
+name: Fetch Week 2 TRI data
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/fetch-week2-tri.yml"
+      - "data/week-2/source-note.md"
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-tri-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download EPA TRI 2024 California Basic Data
+        run: |
+          set -euo pipefail
+          mkdir -p data/week-2
+          curl -L --fail --retry 3 --retry-delay 5 \
+            "https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/2024_CA/csv" \
+            -o data/week-2/tri_ca_basic_2024.csv
+
+      - name: Validate CSV and write source README
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import pandas as pd
+
+          path = Path("data/week-2/tri_ca_basic_2024.csv")
+          df = pd.read_csv(path, low_memory=False)
+          if df.empty:
+              raise SystemExit("Downloaded TRI CSV is empty")
+          required = {"County", "Facility Name", "Chemical", "Total Releases"}
+          missing = sorted(required - set(df.columns.str.strip()))
+          if missing:
+              raise SystemExit(f"Missing expected columns: {missing}")
+          print(f"Validated {path}: {df.shape[0]} rows, {df.shape[1]} columns")
+          PY
+
+          cat > data/week-2/README.md <<'EOF'
+          # Week 2 Studio Data
+
+          This folder contains the public course copy of the EPA Toxics Release Inventory (TRI) Basic Data File used in Week 2 Wednesday Studio.
+
+          ## File
+
+          - `tri_ca_basic_2024.csv`
+
+          ## Source
+
+          - Source page: https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present
+          - EPA download service URL used for this copy: https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/2024_CA/csv
+          - Selection: reporting year 2024, geographic area CA
+
+          ## Notes
+
+          EPA describes TRI Basic Data Files as CSV files containing commonly used fields from TRI reporting forms, including facility information, chemical identification, industry information, on-site releases, off-site transfers, and waste-management quantities.
+
+          EPA notes that dioxin and dioxin-like compounds are reported in grams, while most other TRI release quantities are reported in pounds. Course materials should handle or explicitly name that unit caveat before interpreting release totals.
+          EOF
+
+      - name: Commit data copy
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/week-2/tri_ca_basic_2024.csv data/week-2/README.md
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+          else
+            git commit -m "Add Week 2 TRI California basic data copy"
+            git push
+          fi
