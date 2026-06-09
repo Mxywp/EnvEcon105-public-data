@@ -1,0 +1,39 @@
+variable,description,unit_or_type,source
+county_id,Short county identifier created for this teaching extract,text,Created for course extract
+state,State name,text,EPA AirData / CalEnviroScreen
+county,County name,text,EPA AirData / county FIPS from CalEnviroScreen tract IDs
+year,AQI summary year,year,EPA AirData annual_aqi_by_county_2024
+days_with_aqi,Number of days with a reported county AQI value,days,EPA AirData annual_aqi_by_county_2024
+good_days,Days classified as Good AQI,days,EPA AirData annual_aqi_by_county_2024
+moderate_days,Days classified as Moderate AQI,days,EPA AirData annual_aqi_by_county_2024
+unhealthy_sensitive_days,Days classified as Unhealthy for Sensitive Groups,days,EPA AirData annual_aqi_by_county_2024
+unhealthy_days,Days classified as Unhealthy,days,EPA AirData annual_aqi_by_county_2024
+very_unhealthy_days,Days classified as Very Unhealthy,days,EPA AirData annual_aqi_by_county_2024
+hazardous_days,Days classified as Hazardous,days,EPA AirData annual_aqi_by_county_2024
+unhealthy_or_worse_days,"Sum of unhealthy-sensitive, unhealthy, very unhealthy, and hazardous days",days,Derived from EPA AirData
+pct_good_days,Good days divided by days_with_aqi times 100,percent,Derived from EPA AirData
+pct_unhealthy_or_worse_days,Unhealthy-or-worse days divided by days_with_aqi times 100,percent,Derived from EPA AirData
+median_aqi,Median county AQI value in the year,AQI,EPA AirData annual_aqi_by_county_2024
+p90_aqi,90th percentile county AQI value in the year,AQI,EPA AirData annual_aqi_by_county_2024
+max_aqi,Maximum county AQI value in the year,AQI,EPA AirData annual_aqi_by_county_2024
+days_ozone,Days when ozone drove the county AQI,days,EPA AirData annual_aqi_by_county_2024
+days_pm25,Days when PM2.5 drove the county AQI,days,EPA AirData annual_aqi_by_county_2024
+days_pm10,Days when PM10 drove the county AQI,days,EPA AirData annual_aqi_by_county_2024
+tracts_in_calenviroscreen,Number of census tracts in the county CalEnviroScreen data,tracts,Derived from CalEnviroScreen 4.0
+population_2019_acs,Total tract population summed within county,people,CalEnviroScreen 4.0 ACS2019TotalPop
+avg_ces_percentile_pop_weighted,Population-weighted average CalEnviroScreen percentile across county tracts,percentile 0-100,Derived from CalEnviroScreen 4.0 CIscoreP
+median_ces_percentile_tract,Median tract CalEnviroScreen percentile within county,percentile 0-100,Derived from CalEnviroScreen 4.0 CIscoreP
+share_tracts_ces_pctl_75plus,Share of county tracts at or above the 75th statewide CES percentile,percent,Derived from CalEnviroScreen 4.0 CIscoreP
+avg_pm25_concentration_pop_weighted,Population-weighted average CalEnviroScreen PM2.5 concentration indicator,micrograms per cubic meter,Derived from CalEnviroScreen 4.0 pm
+avg_pm25_percentile_pop_weighted,Population-weighted average PM2.5 percentile across county tracts,percentile 0-100,Derived from CalEnviroScreen 4.0 pmP
+share_tracts_pm25_pctl_75plus,Share of county tracts at or above the 75th statewide PM2.5 percentile,percent,Derived from CalEnviroScreen 4.0 pmP
+avg_ozone_percentile_pop_weighted,Population-weighted average ozone percentile across county tracts,percentile 0-100,Derived from CalEnviroScreen 4.0 ozoneP
+avg_diesel_pm_percentile_pop_weighted,Population-weighted average diesel PM percentile across county tracts,percentile 0-100,Derived from CalEnviroScreen 4.0 dieselP
+avg_traffic_percentile_pop_weighted,Population-weighted average traffic percentile across county tracts,percentile 0-100,Derived from CalEnviroScreen 4.0 trafficP
+avg_pollution_burden_percentile_pop_weighted,Population-weighted average pollution burden percentile across county tracts,percentile 0-100,Derived from CalEnviroScreen 4.0 PollutionP
+avg_population_characteristics_percentile_pop_weighted,Population-weighted average population characteristics percentile across county tracts,percentile 0-100,Derived from CalEnviroScreen 4.0 PopCharP
+avg_poverty_percent_pop_weighted,Population-weighted average poverty percent across county tracts,percent,Derived from CalEnviroScreen 4.0 pov
+avg_unemployment_percent_pop_weighted,Population-weighted average unemployment percent across county tracts,percent,Derived from CalEnviroScreen 4.0 unemp
+avg_children_under10_percent_pop_weighted,Population-weighted average share under age 10 across county tracts,percent,Derived from CalEnviroScreen 4.0 Children_under10.pct
+avg_elderly_65over_percent_pop_weighted,Population-weighted average share age 65+ across county tracts,percent,Derived from CalEnviroScreen 4.0 Elderly_65over.pct
+source_note,Short note describing the joined extract,text,Created for course extract
