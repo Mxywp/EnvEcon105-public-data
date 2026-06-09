@@ -19,6 +19,8 @@ max_aqi,Maximum county AQI value in the year,AQI,EPA AirData annual_aqi_by_count
 days_ozone,Days when ozone drove the county AQI,days,EPA AirData annual_aqi_by_county_2024
 days_pm25,Days when PM2.5 drove the county AQI,days,EPA AirData annual_aqi_by_county_2024
 days_pm10,Days when PM10 drove the county AQI,days,EPA AirData annual_aqi_by_county_2024
+days_co,Days when carbon monoxide drove the county AQI,days,EPA AirData annual_aqi_by_county_2024
+days_no2,Days when nitrogen dioxide drove the county AQI,days,EPA AirData annual_aqi_by_county_2024
 tracts_in_calenviroscreen,Number of census tracts in the county CalEnviroScreen data,tracts,Derived from CalEnviroScreen 4.0
 population_2019_acs,Total tract population summed within county,people,CalEnviroScreen 4.0 ACS2019TotalPop
 avg_ces_percentile_pop_weighted,Population-weighted average CalEnviroScreen percentile across county tracts,percentile 0-100,Derived from CalEnviroScreen 4.0 CIscoreP

@@ -1,0 +1,103 @@
+name: Fetch Week 2 TRI data
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/fetch-week2-tri.yml"
+      - "data/week-2/source-note.md"
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  fetch-tri-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Download EPA TRI 2024 California Basic Data
+        run: |
+          set -euo pipefail
+          mkdir -p data/week-2
+          curl -L --fail --retry 3 --retry-delay 5 \
+            "https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/2024_CA/csv" \
+            -o data/week-2/tri_ca_basic_2024.csv
+          ls -lh data/week-2/tri_ca_basic_2024.csv
+          head -n 1 data/week-2/tri_ca_basic_2024.csv
+
+      - name: Validate CSV and write source README
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import csv
+          import re
+
+          def normalize_label(label):
+              label = re.sub(r"^\s*\d+\.\s*", "", label)
+              return re.sub(r"\s+", " ", label).strip().lower()
+
+          path = Path("data/week-2/tri_ca_basic_2024.csv")
+          if not path.exists():
+              raise SystemExit(f"Missing downloaded file: {path}")
+          if path.stat().st_size == 0:
+              raise SystemExit(f"Downloaded file is empty: {path}")
+
+          with path.open("r", encoding="utf-8-sig", newline="") as f:
+              reader = csv.reader(f)
+              header = next(reader, None)
+              if not header:
+                  raise SystemExit("Downloaded file has no CSV header")
+              clean_header = {normalize_label(col) for col in header}
+              required = {"county", "facility name", "chemical", "total releases"}
+              missing = sorted(required - clean_header)
+              if missing:
+                  raise SystemExit(f"Missing expected normalized columns: {missing}; first columns: {header[:25]}")
+              row_count = sum(1 for _ in reader)
+              if row_count == 0:
+                  raise SystemExit("Downloaded CSV has a header but no data rows")
+
+          print(f"Validated {path}: {row_count:,} data rows, {len(header)} columns")
+          PY
+
+          cat > data/week-2/README.md <<'EOF'
+          # Week 2 Studio Data
+
+          This folder contains the public course copy of the EPA Toxics Release Inventory (TRI) Basic Data File used in Week 2 Wednesday Studio.
+
+          ## File
+
+          - `tri_ca_basic_2024.csv`
+
+          ## Source
+
+          - Source page: https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present
+          - EPA download service URL used for this copy: https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/2024_CA/csv
+          - Selection: reporting year 2024, geographic area CA
+
+          ## Notes
+
+          EPA describes TRI Basic Data Files as CSV files containing commonly used fields from TRI reporting forms, including facility information, chemical identification, industry information, on-site releases, off-site transfers, and waste-management quantities.
+
+          EPA's CSV column names include numeric prefixes, such as `7. COUNTY`. Course notebooks normalize those labels before selecting columns.
+
+          EPA notes that dioxin and dioxin-like compounds are reported in grams, while most other TRI release quantities are reported in pounds. Course materials should handle or explicitly name that unit caveat before interpreting release totals.
+          EOF
+
+      - name: Commit data copy
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/week-2/tri_ca_basic_2024.csv data/week-2/README.md
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+          else
+            git commit -m "Add Week 2 TRI California basic data copy"
+            git push
+          fi
